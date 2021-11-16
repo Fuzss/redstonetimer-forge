@@ -1,0 +1,10 @@
+{
+  "block.redstonetimer.timer": "Timer",
+  "gui.timer.interval": "Timer Intervall: %ss",
+  "gui.timer.minus.minute": "-%sm",
+  "gui.timer.minus.second": "-%ss",
+  "gui.timer.minus.milli": "-%sms",
+  "gui.timer.plus.minute": "+%sm",
+  "gui.timer.plus.second": "+%ss",
+  "gui.timer.plus.milli": "+%sms"
+}
