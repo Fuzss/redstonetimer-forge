@@ -39,16 +39,16 @@ public class TimerScreen extends Screen implements MenuAccess<TimerMenu> {
     @Override
     protected void init() {
         super.init();
-        this.addRenderableWidget(new Button(this.width / 2 + 43, this.height / 2 - 12, 40, 20, new TranslatableComponent("gui.timer.minus.milli", 200), (p_99024_) -> {
+        this.addRenderableWidget(new Button(this.width / 2 - 83, this.height / 2 - 12, 40, 20, new TranslatableComponent("gui.timer.minus.milli", 200), (p_99024_) -> {
             this.sendButtonClick(-1);
         }));
-        this.addRenderableWidget(new Button(this.width / 2 + 1, this.height / 2 - 12, 40, 20, new TranslatableComponent("gui.timer.minus.second", 1), (p_99024_) -> {
+        this.addRenderableWidget(new Button(this.width / 2 - 41, this.height / 2 - 12, 40, 20, new TranslatableComponent("gui.timer.minus.second", 1), (p_99024_) -> {
             this.sendButtonClick(-2);
         }));
-        this.addRenderableWidget(new Button(this.width / 2 - 41, this.height / 2 - 12, 40, 20, new TranslatableComponent("gui.timer.minus.second", 10), (p_99024_) -> {
+        this.addRenderableWidget(new Button(this.width / 2 + 1, this.height / 2 - 12, 40, 20, new TranslatableComponent("gui.timer.minus.second", 10), (p_99024_) -> {
             this.sendButtonClick(-3);
         }));
-        this.addRenderableWidget(new Button(this.width / 2 - 83, this.height / 2 - 12, 40, 20, new TranslatableComponent("gui.timer.minus.minute", 1), (p_99024_) -> {
+        this.addRenderableWidget(new Button(this.width / 2 + 43, this.height / 2 - 12, 40, 20, new TranslatableComponent("gui.timer.minus.minute", 1), (p_99024_) -> {
             this.sendButtonClick(-4);
         }));
         this.addRenderableWidget(new Button(this.width / 2 - 83, this.height / 2 + 12, 40, 20, new TranslatableComponent("gui.timer.plus.milli", 200), (p_99024_) -> {
@@ -78,7 +78,7 @@ public class TimerScreen extends Screen implements MenuAccess<TimerMenu> {
         RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
         RenderSystem.setShaderTexture(0, TIMER_BACKGROUND_LOCATION);
         this.blit(pPoseStack,this.width / 2 - 88, this.height / 2 - 43, 0, 0, 176, 86);
-        final TranslatableComponent text = new TranslatableComponent("gui.timer.interval", this.getMenu().getInterval());
+        final TranslatableComponent text = new TranslatableComponent("gui.timer.interval", String.format("%.3f", this.getMenu().getTicksInterval() / 20.0F));
         this.font.draw(pPoseStack, text, this.width / 2 - this.font.width(text.getVisualOrderText()) / 2, this.height / 2 - 32, 4210752);
         super.render(pPoseStack, pMouseX, pMouseY, pPartialTick);
     }
