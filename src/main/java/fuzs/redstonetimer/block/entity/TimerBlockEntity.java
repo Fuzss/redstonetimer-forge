@@ -1,5 +1,6 @@
 package fuzs.redstonetimer.block.entity;
 
+import fuzs.redstonetimer.block.TimerBlock;
 import fuzs.redstonetimer.registry.ModRegistry;
 import fuzs.redstonetimer.world.inventory.TimerMenu;
 import net.minecraft.core.BlockPos;
@@ -8,6 +9,7 @@ import net.minecraft.network.Connection;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.TextComponent;
 import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.Mth;
@@ -90,6 +92,10 @@ public class TimerBlockEntity extends BlockEntity implements MenuProvider {
         return this.time < this.getTimeActive();
     }
 
+    public boolean powerStateChanged() {
+        return this.time == 0 || (!this.isPowered() && this.time - 1 < this.getTimeActive());
+    }
+
     private void setInterval(int interval) {
         int oldInterval = this.interval;
         this.interval = Mth.clamp(interval, MIN_INTERVAL, MAX_INTERVAL);
@@ -101,17 +107,13 @@ public class TimerBlockEntity extends BlockEntity implements MenuProvider {
         }
     }
 
-    private boolean isRotating() {
-        return !this.isPowered();
-    }
-
     public float getRotationAngle(float tickDelta) {
-        float rotationAngle = 0.0F;
-        if (this.isRotating()) {
+        float rotationAngle = 180.0F;
+        if (!this.isPowered()) {
             float rotationTime = this.time - this.getTimeActive() + tickDelta;
-            rotationAngle = rotationTime / (this.interval - this.getTimeActive()) * -360.0F;
+            rotationAngle += rotationTime / (this.interval - this.getTimeActive()) * -360.0F;
         }
-        return rotationAngle;
+        return rotationAngle % 360.0F;
     }
 
     public boolean stillValid(Player player) {
@@ -127,11 +129,28 @@ public class TimerBlockEntity extends BlockEntity implements MenuProvider {
         return new TimerMenu(pContainerId, this, this.dataAccess);
     }
 
-    public static void tick(Level world, BlockPos pos, BlockState state, TimerBlockEntity blockEntity) {
+    public static void clientTick(Level pLevel, BlockPos pPos, BlockState pState, TimerBlockEntity pBlockEntity) {
+        tick(pLevel, pPos, pState, pBlockEntity);
+    }
+
+    public static void serverTick(Level pLevel, BlockPos pPos, BlockState pState, TimerBlockEntity pBlockEntity) {
+        final boolean unlocked = tick(pLevel, pPos, pState, pBlockEntity);
+        if (unlocked && pBlockEntity.powerStateChanged() && pState.getBlock() instanceof TimerBlock timerBlock) {
+            // TODO avoid passing null argument
+            timerBlock.tick(pState, (ServerLevel) pLevel, pPos, null);
+        }
+    }
+
+    private static boolean tick(Level world, BlockPos pos, BlockState state, TimerBlockEntity blockEntity) {
+        if (state.getValue(TimerBlock.LOCKED)) {
+            blockEntity.time = 0;
+            return false;
+        }
         if (++blockEntity.time >= blockEntity.interval) {
             blockEntity.time = 0;
             world.playSound(null, pos, SoundEvents.LEVER_CLICK, SoundSource.BLOCKS, 0.3F, 0.5F);
         }
+        return true;
     }
 
     @Override
