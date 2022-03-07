@@ -1,6 +1,6 @@
 package fuzs.redstonetimer.world.inventory;
 
-import fuzs.redstonetimer.block.entity.TimerBlockEntity;
+import fuzs.redstonetimer.world.level.block.entity.TimerBlockEntity;
 import fuzs.redstonetimer.registry.ModRegistry;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.player.Player;
@@ -41,6 +41,7 @@ public class TimerMenu extends AbstractContainerMenu {
         return false;
     }
 
+    @Override
     public void setData(int pId, int pData) {
         super.setData(pId, pData);
         this.broadcastChanges();
@@ -53,7 +54,7 @@ public class TimerMenu extends AbstractContainerMenu {
     private int getTicksIncrement(int buttonId) {
         return (int) Math.signum(buttonId) * switch (Math.abs(buttonId)) {
             // in game ticks
-            case 1 -> 4;
+            case 1 -> 2;
             case 2 -> 20;
             case 3 -> 200;
             case 4 -> 1200;

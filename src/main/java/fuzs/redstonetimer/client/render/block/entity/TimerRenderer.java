@@ -2,9 +2,9 @@ package fuzs.redstonetimer.client.render.block.entity;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
-import fuzs.redstonetimer.block.TimerBlock;
-import fuzs.redstonetimer.block.entity.TimerBlockEntity;
-import fuzs.redstonetimer.client.registry.ModEntityModelLayers;
+import fuzs.redstonetimer.client.registry.ModClientRegistry;
+import fuzs.redstonetimer.world.level.block.TimerBlock;
+import fuzs.redstonetimer.world.level.block.entity.TimerBlockEntity;
 import net.minecraft.client.model.geom.ModelPart;
 import net.minecraft.client.model.geom.PartPose;
 import net.minecraft.client.model.geom.builders.*;
@@ -23,7 +23,7 @@ public class TimerRenderer implements BlockEntityRenderer<TimerBlockEntity> {
     private final ModelPart timerPointer;
 
     public TimerRenderer(BlockEntityRendererProvider.Context ctx) {
-        ModelPart modelPart = ctx.bakeLayer(ModEntityModelLayers.TIMER);
+        ModelPart modelPart = ctx.bakeLayer(ModClientRegistry.TIMER);
         this.timerPointer = modelPart.getChild(TIMER_POINTER);
     }
 

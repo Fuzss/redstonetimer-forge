@@ -1,11 +1,10 @@
-package fuzs.redstonetimer.block.entity;
+package fuzs.redstonetimer.world.level.block.entity;
 
-import fuzs.redstonetimer.block.TimerBlock;
 import fuzs.redstonetimer.registry.ModRegistry;
 import fuzs.redstonetimer.world.inventory.TimerMenu;
+import fuzs.redstonetimer.world.level.block.TimerBlock;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.network.Connection;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.TextComponent;
 import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
@@ -21,8 +20,6 @@ import net.minecraft.world.inventory.ContainerData;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
-
-import javax.annotation.Nullable;
 
 public class TimerBlockEntity extends BlockEntity implements MenuProvider {
     public static final int MIN_INTERVAL = 4;
@@ -54,14 +51,6 @@ public class TimerBlockEntity extends BlockEntity implements MenuProvider {
     }
 
     @Override
-    public CompoundTag save(CompoundTag nbt) {
-        super.save(nbt);
-        nbt.putInt("Time", this.time);
-        nbt.putInt("Interval", this.interval);
-        return nbt;
-    }
-
-    @Override
     public void load(CompoundTag nbt) {
         super.load(nbt);
         this.time = nbt.getInt("Time");
@@ -69,31 +58,32 @@ public class TimerBlockEntity extends BlockEntity implements MenuProvider {
     }
 
     @Override
+    public void saveAdditional(CompoundTag nbt) {
+        super.saveAdditional(nbt);
+        nbt.putInt("Time", this.time);
+        nbt.putInt("Interval", this.interval);
+    }
+
+    @Override
     public CompoundTag getUpdateTag() {
-        return this.save(new CompoundTag());
+        return this.saveWithoutMetadata();
     }
 
     @Override
-    @Nullable
     public ClientboundBlockEntityDataPacket getUpdatePacket() {
-        return new ClientboundBlockEntityDataPacket(this.worldPosition, -1, this.getUpdateTag());
+        return ClientboundBlockEntityDataPacket.create(this);
     }
 
-    @Override
-    public void onDataPacket(Connection net, ClientboundBlockEntityDataPacket pkt){
-        this.load(pkt.getTag());
-    }
-
-    public int getTimeActive() {
+    public int getTicksActive() {
         return 2;
     }
 
     public boolean isPowered() {
-        return this.time < this.getTimeActive();
+        return this.time >= this.interval - this.getTicksActive();
     }
 
-    public boolean powerStateChanged() {
-        return this.time == 0 || (!this.isPowered() && this.time - 1 < this.getTimeActive());
+    public boolean hasPowerStateChanged() {
+        return this.time == 0 || this.time == this.interval - this.getTicksActive();
     }
 
     private void setInterval(int interval) {
@@ -110,8 +100,8 @@ public class TimerBlockEntity extends BlockEntity implements MenuProvider {
     public float getRotationAngle(float tickDelta) {
         float rotationAngle = 180.0F;
         if (!this.isPowered()) {
-            float rotationTime = this.time - this.getTimeActive() + tickDelta;
-            rotationAngle += rotationTime / (this.interval - this.getTimeActive()) * -360.0F;
+            float rotationTime = this.time - this.getTicksActive() + tickDelta;
+            rotationAngle += rotationTime / (this.interval - this.getTicksActive()) * -360.0F;
         }
         return rotationAngle % 360.0F;
     }
@@ -133,11 +123,10 @@ public class TimerBlockEntity extends BlockEntity implements MenuProvider {
         tick(pLevel, pPos, pState, pBlockEntity);
     }
 
-    public static void serverTick(Level pLevel, BlockPos pPos, BlockState pState, TimerBlockEntity pBlockEntity) {
-        final boolean unlocked = tick(pLevel, pPos, pState, pBlockEntity);
-        if (unlocked && pBlockEntity.powerStateChanged() && pState.getBlock() instanceof TimerBlock timerBlock) {
-            // TODO avoid passing null argument
-            timerBlock.tick(pState, (ServerLevel) pLevel, pPos, null);
+    public static void serverTick(Level level, BlockPos pPos, BlockState pState, TimerBlockEntity pBlockEntity) {
+        boolean unlocked = tick(level, pPos, pState, pBlockEntity);
+        if (unlocked && pBlockEntity.hasPowerStateChanged() && pState.getBlock() instanceof TimerBlock timerBlock) {
+            timerBlock.tick(pState, (ServerLevel) level, pPos, level.random);
         }
     }
 
@@ -148,6 +137,8 @@ public class TimerBlockEntity extends BlockEntity implements MenuProvider {
         }
         if (++blockEntity.time >= blockEntity.interval) {
             blockEntity.time = 0;
+        }
+        if (blockEntity.hasPowerStateChanged() && blockEntity.isPowered()) {
             world.playSound(null, pos, SoundEvents.LEVER_CLICK, SoundSource.BLOCKS, 0.3F, 0.5F);
         }
         return true;
