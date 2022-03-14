@@ -1,64 +1,64 @@
 {
   "variants": {
-    "facing=east,locked=false,powered=false": {
+    "facing=east,pulse=false,powered=false": {
       "y": 270,
       "model": "redstonetimer:block/timer"
     },
-    "facing=east,locked=false,powered=true": {
+    "facing=east,pulse=false,powered=true": {
       "y": 270,
       "model": "redstonetimer:block/timer_on"
     },
-    "facing=east,locked=true,powered=false": {
-      "y": 270,
-      "model": "redstonetimer:block/timer_locked"
-    },
-    "facing=east,locked=true,powered=true": {
+    "facing=east,pulse=true,powered=false": {
       "y": 270,
       "model": "redstonetimer:block/timer"
     },
-    "facing=north,locked=false,powered=false": {
+    "facing=east,pulse=true,powered=true": {
+      "y": 270,
+      "model": "redstonetimer:block/timer_on"
+    },
+    "facing=north,pulse=false,powered=false": {
       "y": 180,
       "model": "redstonetimer:block/timer"
     },
-    "facing=north,locked=false,powered=true": {
+    "facing=north,pulse=false,powered=true": {
       "y": 180,
       "model": "redstonetimer:block/timer_on"
     },
-    "facing=north,locked=true,powered=false": {
-      "y": 180,
-      "model": "redstonetimer:block/timer_locked"
-    },
-    "facing=north,locked=true,powered=true": {
+    "facing=north,pulse=true,powered=false": {
       "y": 180,
       "model": "redstonetimer:block/timer"
     },
-    "facing=south,locked=false,powered=false": {
-      "model": "redstonetimer:block/timer"
-    },
-    "facing=south,locked=false,powered=true": {
+    "facing=north,pulse=true,powered=true": {
+      "y": 180,
       "model": "redstonetimer:block/timer_on"
     },
-    "facing=south,locked=true,powered=false": {
-      "model": "redstonetimer:block/timer_locked"
-    },
-    "facing=south,locked=true,powered=true": {
+    "facing=south,pulse=false,powered=false": {
       "model": "redstonetimer:block/timer"
     },
-    "facing=west,locked=false,powered=false": {
+    "facing=south,pulse=false,powered=true": {
+      "model": "redstonetimer:block/timer_on"
+    },
+    "facing=south,pulse=true,powered=false": {
+      "model": "redstonetimer:block/timer"
+    },
+    "facing=south,pulse=true,powered=true": {
+      "model": "redstonetimer:block/timer_on"
+    },
+    "facing=west,pulse=false,powered=false": {
       "y": 90,
       "model": "redstonetimer:block/timer"
     },
-    "facing=west,locked=false,powered=true": {
+    "facing=west,pulse=false,powered=true": {
       "y": 90,
       "model": "redstonetimer:block/timer_on"
     },
-    "facing=west,locked=true,powered=false": {
-      "y": 90,
-      "model": "redstonetimer:block/timer_locked"
-    },
-    "facing=west,locked=true,powered=true": {
+    "facing=west,pulse=true,powered=false": {
       "y": 90,
       "model": "redstonetimer:block/timer"
+    },
+    "facing=west,pulse=true,powered=true": {
+      "y": 90,
+      "model": "redstonetimer:block/timer_on"
     }
   }
 }

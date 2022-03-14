@@ -22,6 +22,7 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 
 public class TimerBlockEntity extends BlockEntity implements MenuProvider {
+    public static final int PULSE_LENGTH = 2;
     public static final int MIN_INTERVAL = 4;
     public static final int MAX_INTERVAL = 72000;
 
@@ -75,7 +76,7 @@ public class TimerBlockEntity extends BlockEntity implements MenuProvider {
     }
 
     public int getTicksActive() {
-        return 2;
+        return PULSE_LENGTH;
     }
 
     public boolean isPowered() {
@@ -100,8 +101,7 @@ public class TimerBlockEntity extends BlockEntity implements MenuProvider {
     public float getRotationAngle(float tickDelta) {
         float rotationAngle = 180.0F;
         if (!this.isPowered()) {
-            float rotationTime = this.time - this.getTicksActive() + tickDelta;
-            rotationAngle += rotationTime / (this.interval - this.getTicksActive()) * -360.0F;
+            rotationAngle += (this.time + tickDelta) / (this.interval - this.getTicksActive()) * -360.0F;
         }
         return rotationAngle % 360.0F;
     }
@@ -124,15 +124,15 @@ public class TimerBlockEntity extends BlockEntity implements MenuProvider {
     }
 
     public static void serverTick(Level level, BlockPos pPos, BlockState pState, TimerBlockEntity pBlockEntity) {
-        boolean unlocked = tick(level, pPos, pState, pBlockEntity);
-        if (unlocked && pBlockEntity.hasPowerStateChanged() && pState.getBlock() instanceof TimerBlock timerBlock) {
-            timerBlock.tick(pState, (ServerLevel) level, pPos, level.random);
+        if (tick(level, pPos, pState, pBlockEntity) && pBlockEntity.hasPowerStateChanged()) {
+//            pState.getBlock().tick(pState, (ServerLevel) level, pPos, level.random);
+            level.scheduleTick(pPos, pState.getBlock(), 1);
         }
     }
 
     private static boolean tick(Level world, BlockPos pos, BlockState state, TimerBlockEntity blockEntity) {
-        if (state.getValue(TimerBlock.LOCKED)) {
-            blockEntity.time = 0;
+        if (!state.getValue(TimerBlock.PULSE) && state.getValue(TimerBlock.POWERED)) {
+            blockEntity.time = blockEntity.interval - blockEntity.getTicksActive();
             return false;
         }
         if (++blockEntity.time >= blockEntity.interval) {
